@@ -107,6 +107,11 @@ socket.on('gen',
     }
 });
 
+socket.on('ne', function(e){
+	var en = new Entity(createVector(e.x, e.y), null, e.player, e.score);
+	entities.push(en);
+});
+
 socket.on('pop', function(E){
     print("Loading Entities...");
     for(e in E){
