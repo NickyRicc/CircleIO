@@ -38,11 +38,6 @@ io.sockets.on('connection', function(socket) {
     
     socket.on('ate', function(e){
         removeEntity(e);
-			var e = newEntity();
-			entities.push(e);
-		if(entities.length <= eA-1){
-        io.sockets.emit('pop', e);
-		}
     });
     
     socket.on('update', function(player){
@@ -156,6 +151,8 @@ function removeEntity(e){
     for(i in entities){
         if(entities[i].x === e.x && entities[i].y === e.y){
             entities.splice(i, 1);
+			var e = newEntity();
+        	io.sockets.emit('ne', e);
             continue;
         }else{
             continue;
