@@ -57,22 +57,21 @@ function Player (name, location, l2, score, player, id) {
     text(getName(), (this.loc.x) - (getName().length*1.5), (this.loc.y));
   }
 
-  //function canKill() {
-  //  var tmp = [];
-  //  for (var p in players) {
-  //    if (p != this) {
-  //      if (dist(p.loc2.x, p.loc2.y, this.loc2.x, this.loc2.y) <= r) {
-  //        tmp.add(p);
-  //        continue;
-  //      } else {
-  //        continue;
-  //      }
-  //    } else {
-  //      continue;
-  //    }
-  //  }
-  //  return tmp;
-  //}
+  this.canKill = function() {
+    for (var p in players) {
+      if (players[p].loc != this.loc2) {
+        if (dist(players[p].loc2.x, players[p].loc2.y, this.loc2.x, this.loc2.y) <= this.r/2) {
+          return players[p];
+          continue;
+        } else {
+          continue;
+        }
+      } else {
+        continue;
+      }
+    }
+    return null;
+  }
 
   this.kill = function() {
     dead = true;
@@ -91,10 +90,12 @@ function Player (name, location, l2, score, player, id) {
       this.r = this.getRadius();
       removeEntity(e);
     }
-    //for (var p in canKill()) {
-    //  this.score+=p.score;
-    //  this.r = this.getRadius();
-    //}
+	player = this.canKill();
+	if(player != null){
+		print("Killed!");
+		socket.emit('kill', convertPlayer(player));
+		this.score += player.score;
+	}
   }
   
 }
