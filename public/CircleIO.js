@@ -1,6 +1,6 @@
 // Constants for the amount of cells and their sizes
-var sqrR = 1000;
-var cellR = 20;
+var sqrR;
+var cellR;
 var zoom = 1;
 // Viewing distance constant
 var vDist;
@@ -27,7 +27,7 @@ var Atiles = [];
 
 var players = [];
 
-var socket = io.connect('http://10.2.2.207');
+var socket = io.connect('http://' + prompt("Server IP:"));
 
 var id;
 
@@ -43,9 +43,10 @@ function setup() {
 	frameRate(60);
 	vDist = width / 8;
 	// createVector(random(-sqrR/2, sqrR/2), random(-sqrR/2, sqrR/2))
-	this.player = new Player(name, createVector(width/2, height/2), createVector(0, 0), 10, true, socket.id);
+	this.player = new Player(name, createVector(width/2, height/2), createVector(random(-sqrR, sqrR), random(-sqrR, sqrR)), 10, true, socket.id);
     socket.emit('getID');
 	var i = 0;
+	document.title = "CircleIO";
 }
 
 var startTime;
@@ -54,6 +55,23 @@ setInterval(function() {
   startTime = Date.now();
   socket.emit('ping');
 }, 500);
+
+socket.on('killed', function(pl){
+	print(pl);
+	if(pl.x == this.player.loc2.x && pl.y == this.player.loc2.y){
+		this.player = null;
+		this.name = prompt("Enter Name:");
+	if (name == null || name == "") {
+		name = "Anon";
+	}
+	this.player = new Player(name, createVector(width/2, height/2), createVector(random(-sqrR, sqrR), random(-sqrR, sqrR)), 10, true, socket.id);
+		return;	
+	}else{
+		i = players.indexOf(pl);
+		players.splice(i, 1);
+		return;	
+	}
+});
 
 socket.on('id', function(id){
     print("Connected with id:" + id);
@@ -97,8 +115,10 @@ socket.on('players', function(pl){
 });
 
 socket.on('gen', 
-          function(v){
+          function(v, sq, cr){
     print("Loading Map...");
+	sqrR = sq;
+	cellR = cr;
     if(tiles.length <= 0){
     for(vec in v){
         tiles[vec] = createVector(v[vec].x, v[vec].y);
@@ -311,8 +331,6 @@ function displayName(name, cp) {
     fill(0);
     textSize(15);
     text(name, (cp.loc.x), (cp.loc.y));
-    print(name);
-    print(cp);
   }
 
 function containse(e){
@@ -322,6 +340,10 @@ function containse(e){
         }
     }
     return false;
+}
+
+function convertPlayer(player){
+	return new PL(player.loc2.x, player.loc2.y, player.score, player.id);	
 }
 
 function PL(x, y, score, name, id){
