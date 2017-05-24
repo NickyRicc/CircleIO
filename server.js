@@ -26,7 +26,7 @@ var io = require('socket.io')(server, {'pingInterval': 2000, 'pingTimeout': 1000
 
 io.sockets.on('connection', function(socket) {
 	console.log("New user connected with id: " + socket.id);
-	socket.emit('gen', tiles);
+	socket.emit('gen', tiles, sqrR, cellR);
     socket.emit('pop', entities);
     
     socket.on('disconnect', function () {
@@ -38,7 +38,13 @@ io.sockets.on('connection', function(socket) {
     
     socket.on('ate', function(e){
         removeEntity(e);
+		socket.emit('eaten', e);
     });
+	
+	socket.on('kill', function(pl){
+		console.log("Player: " + pl.name + " has been killed!");
+		io.sockets.emit('killed', pl);
+	});
     
     socket.on('update', function(player){
         io.sockets.emit('players', player);
