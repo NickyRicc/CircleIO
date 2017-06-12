@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var intIp = require('internal-ip')
 var server = app.listen(80, function(){
     listen();
 });
@@ -14,9 +15,7 @@ var removeE = [];
 app.use(express.static('public'));
 
 function listen() {
-	var host = server.address().address;
-	var port = server.address().port;
-	console.log('App listening at http://localhost:' + port);
+	console.log('App listening at http://' + intIp.v4());
 	initPop();
 	genMap();
 }
